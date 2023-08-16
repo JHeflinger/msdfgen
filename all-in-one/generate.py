@@ -68,7 +68,6 @@ header = """
 source = """
 #include "msdfgen.h"
 
-#include <algorithm>
 #include <queue>
 
 #ifdef MSDFGEN_USE_FREETYPE
@@ -81,11 +80,23 @@ source = """
 #endif
 
 #ifdef _MSC_VER
-#pragma warning(disable : 4456 4458)
+#pragma warning(push)
+#pragma warning(disable : 4456 4457 4458)
+#elif defined(__GNUC__)
+#pragma GCC diagnostic push
+#pragma GCC diagnostic ignored "-Wshadow"
 #endif
 
 #ifndef M_PI
 #define M_PI 3.1415926535897932384626433832795
+#endif
+"""
+
+sourceAppendix = """
+#ifdef _MSC_VER
+#pragma warning(pop)
+#elif defined(__GNUC__)
+#pragma GCC diagnostic pop
 #endif
 """
 
@@ -134,7 +145,7 @@ source = """
 """+license+"""
  *
  */
-"""+source
+"""+source+sourceAppendix
 
 with open(os.path.join(os.path.dirname(__file__), 'msdfgen.h'), 'w') as file:
     file.write(header)
